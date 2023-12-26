@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.x]  # Replace '3.x' with the exact version you used in development
+        python-version: [3.8]
 
     steps:
     - uses: actions/checkout@v2
