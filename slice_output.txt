@@ -1,0 +1,8 @@
+workclass: {'Precision': 1.0, 'Recall': 1.0, 'F1_Beta': 1.0}
+education: {'Precision': 1.0, 'Recall': 1.0, 'F1_Beta': 1.0}
+marital-status: {'Precision': 0.0, 'Recall': 0.0, 'F1_Beta': 1.0}
+occupation: {'Precision': 1.0, 'Recall': 1.0, 'F1_Beta': 1.0}
+relationship: {'Precision': 0.75, 'Recall': 0.3333333333333333, 'F1_Beta': 0.46153846153846156}
+race: {'Precision': 0.5, 'Recall': 0.375, 'F1_Beta': 0.42857142857142855}
+sex: {'Precision': 0.8011363636363636, 'Recall': 0.597457627118644, 'F1_Beta': 0.6844660194174756}
+native-country: {'Precision': 1.0, 'Recall': 0.0, 'F1_Beta': 0.0}
