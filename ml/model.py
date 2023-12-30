@@ -1,6 +1,8 @@
 from sklearn.metrics import fbeta_score, precision_score, recall_score
+from ml.data import load_encoders, process_data
 import catboost as cb
 import optuna
+import pickle
 
 def train_model(x_train, y_train):
     """
@@ -37,13 +39,14 @@ def train_model(x_train, y_train):
         model.fit(x_train, y_train)
 
         # Evaluate the model
-        score = model.get_best_score()
+        preds = inference(model,x_train)
+        f1_score = compute_model_metrics(y_train, preds)[-1]
 
-        return score
+        return f1_score
 
     # Create a study object and optimize the objective function
     study = optuna.create_study(direction='maximize')
-    study.optimize(objective, n_trials=100)
+    study.optimize(objective, n_trials=1)
 
     # Train the final model with the best hyperparameters
     best_params = study.best_params
@@ -52,6 +55,26 @@ def train_model(x_train, y_train):
 
     return model
 
+
+def save_model(model, filename):
+    """
+    Saves a machine learning model to a file.
+
+    Parameters
+    ----------
+    model : object
+        The machine learning model to be saved.
+    filename : str
+        The file path where the model should be saved.
+    """
+
+    # Check if the model is a CatBoost model
+    try:
+        model.save_model(filename)
+    except AttributeError as e:
+        # Use pickle for other model types
+        with open(filename, 'wb') as file:
+            pickle.dump (model, file)
 
 def compute_model_metrics(y_ground, preds):
     """
@@ -75,18 +98,19 @@ def compute_model_metrics(y_ground, preds):
     return precision, recall, fbeta
 
 
-def inference(model, X):
+def inference(model, input_data):
     """ Run model inferences and return the predictions.
 
     Inputs
     ------
-    model : ???
+    model : pickle
         Trained machine learning model.
-    X : np.array
+    input_data : np.array
         Data used for prediction.
     Returns
     -------
     preds : np.array
         Predictions from the model.
     """
-    pass
+
+    return model.predict(input_data)

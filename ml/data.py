@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import LabelBinarizer, OneHotEncoder
+import joblib
 
 
 def process_data(
@@ -68,3 +69,58 @@ def process_data(
 
     features = np.concatenate([x_continuous, x_categorical], axis=1)
     return features, dep_var, encoder, lb
+
+
+def save_encoders(encoder, lb, encoder_filepath, lb_filepath):
+    """ Save the trained OneHotEncoder and LabelBinarizer to disk.
+
+    This function saves the trained OneHotEncoder and LabelBinarizer objects to disk,
+    allowing them to be reused for processing new data in inference or validation. This
+    ensures that the same preprocessing steps used during training are applied consistently.
+
+    Inputs
+    ------
+    encoder : sklearn.preprocessing._encoders.OneHotEncoder
+        Trained OneHotEncoder object to be saved.
+    lb : sklearn.preprocessing._label.LabelBinarizer
+        Trained LabelBinarizer object to be saved.
+    encoder_filepath : str
+        Filepath for saving the OneHotEncoder object.
+    lb_filepath : str
+        Filepath for saving the LabelBinarizer object.
+
+    Returns
+    -------
+    None
+    """
+
+    joblib.dump(encoder, encoder_filepath)
+    joblib.dump(lb, lb_filepath)
+
+
+def load_encoders(encoder_filepath, lb_filepath):
+    """ Load the trained OneHotEncoder and LabelBinarizer from disk.
+
+    This function loads the OneHotEncoder and LabelBinarizer objects from disk,
+    which were previously saved during the training phase. Loading these objects
+    allows for consistent preprocessing steps to be applied to new data during
+    inference or validation.
+
+    Inputs
+    ------
+    encoder_filepath : str
+        Filepath from where to load the OneHotEncoder object.
+    lb_filepath : str
+        Filepath from where to load the LabelBinarizer object.
+
+    Returns
+    -------
+    encoder : sklearn.preprocessing._encoders.OneHotEncoder
+        Loaded OneHotEncoder object.
+    lb : sklearn.preprocessing._label.LabelBinarizer
+        Loaded LabelBinarizer object.
+    """
+
+    encoder = joblib.load(encoder_filepath)
+    lb = joblib.load(lb_filepath)
+    return encoder, lb
