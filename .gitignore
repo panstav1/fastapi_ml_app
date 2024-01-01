@@ -13,6 +13,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+catboost_info/
 .eggs/
 lib/
 lib64/
