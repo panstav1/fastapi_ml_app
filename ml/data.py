@@ -50,6 +50,7 @@ def process_data(
         features = input_data.drop([label], axis=1)
     else:
         dep_var = np.array([])
+        features = input_data
 
     x_categorical = features[categorical_features].values
     x_continuous = features.drop(*[categorical_features], axis=1)

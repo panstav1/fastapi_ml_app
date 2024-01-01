@@ -1,8 +1,31 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from typing import Optional
+from ml.data import process_data, load_encoders
+from ml.model import inference, load_model
+import constants
+import os
+import pandas as pd
 
 app = FastAPI()
+
+# Global variables to store the model, encoder, and label binarizer
+model = None
+encoder = None
+lb = None
+cat_features = None
+
+@app.on_event("startup")
+async def load_components():
+    global model, encoder, lb, cat_features
+
+    cat_features = constants.cat_features
+    # Load the model, encoder, and label binarizer
+    model = load_model(os.path.join(os.path.join(constants.model_folder, constants.model_file)))
+
+    encoder, lb = load_encoders (os.path.join (constants.model_folder, constants.model_encoder),
+                                 os.path.join (constants.model_folder, constants.label_bin))
+
+
 
 # Pydantic model for the POST request
 class InferenceRequest(BaseModel):
@@ -52,5 +75,17 @@ async def read_root():
 # POST route for model inference
 @app.post("/infer/")
 async def do_inference(request: InferenceRequest):
+    global encoder, lb, model, cat_features
 
-    return {"message": f"Data received: {request.workclass}", "param": request.age}
+    # Proces the test data with the process_data function.
+    request_dict = request.model_dump (by_alias=True)
+
+    # Create a DataFrame from the dictionary
+    request_df = pd.DataFrame ([request_dict])
+
+    X_test, _, encoder, lb = process_data (
+        request_df, categorical_features=cat_features, training=False, encoder=encoder, lb=lb
+    )
+
+    y_pred = inference (model, X_test)
+    return {"Inference": f"{lb.inverse_transform(y_pred)}"}
