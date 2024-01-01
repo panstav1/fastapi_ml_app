@@ -76,6 +76,32 @@ def save_model(model, filename):
         with open(filename, 'wb') as file:
             pickle.dump (model, file)
 
+
+def load_model(filename):
+    """
+    Loads a machine learning model from a file.
+
+    Parameters
+    ----------
+    filename : str
+        The file path from where the model should be loaded.
+
+    Returns
+    -------
+    model : object
+        The loaded machine learning model.
+    """
+    try:
+        # Attempt to load as a CatBoost model
+        model = cb.CatBoostClassifier()
+        model.load_model(filename)
+    except Exception as e:
+        # If loading as a CatBoost model fails, try loading with pickle
+        with open(filename, 'rb') as file:
+            model = pickle.load(file)
+
+    return model
+
 def compute_model_metrics(y_ground, preds):
     """
     Validates the trained machine learning model using precision, recall, and F1.
