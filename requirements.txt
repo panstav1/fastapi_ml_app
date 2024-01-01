@@ -5,4 +5,5 @@ pytest==7.4.3
 requests==2.31.0
 fastapi==0.105.0
 catboost==1.2.2
+httpx==0.26.0
 optuna==3.5.0
