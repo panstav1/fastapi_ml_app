@@ -8,24 +8,18 @@ import pandas as pd
 
 app = FastAPI()
 
-# Global variables to store the model, encoder, and label binarizer
-model = None
-encoder = None
-lb = None
-cat_features = None
-
 @app.on_event("startup")
 async def load_components():
-    global model, encoder, lb, cat_features
 
-    cat_features = constants.cat_features
     # Load the model, encoder, and label binarizer
-    model = load_model(os.path.join(os.path.join(constants.model_folder, constants.model_file)))
+    app.state.model = load_model(os.path.join(os.path.abspath(constants.model_folder),
+                                              constants.model_file
+                                              ))
 
-    encoder, lb = load_encoders (os.path.join (constants.model_folder, constants.model_encoder),
-                                 os.path.join (constants.model_folder, constants.label_bin))
-
-
+    app.state.encoder, app.state.lb = load_encoders (os.path.join (os.path.abspath(constants.model_folder),
+                                                                   constants.model_encoder),
+                                                        os.path.join (os.path.abspath(constants.model_folder),
+                                                                      constants.label_bin))
 
 # Pydantic model for the POST request
 class InferenceRequest(BaseModel):
@@ -33,7 +27,7 @@ class InferenceRequest(BaseModel):
     workclass: str
     fnlgt: int
     education: str
-    edunation_int: str = Field(None, alias='my-field')
+    edunation_int: str = Field(None, alias='education-int')
     marital: str = Field(None, alias='marital-status')
     occupation: str
     relationship: str
@@ -75,7 +69,6 @@ async def read_root():
 # POST route for model inference
 @app.post("/infer/")
 async def do_inference(request: InferenceRequest):
-    global encoder, lb, model, cat_features
 
     # Proces the test data with the process_data function.
     request_dict = request.model_dump (by_alias=True)
@@ -83,9 +76,9 @@ async def do_inference(request: InferenceRequest):
     # Create a DataFrame from the dictionary
     request_df = pd.DataFrame ([request_dict])
 
-    X_test, _, encoder, lb = process_data (
-        request_df, categorical_features=cat_features, training=False, encoder=encoder, lb=lb
+    X_test, _, _,_ = process_data (
+        request_df, categorical_features=constants.cat_features, training=False, encoder=app.state.encoder, lb=app.state.lb
     )
 
-    y_pred = inference (model, X_test)
-    return {"Inference": f"{lb.inverse_transform(y_pred)}"}
+    y_pred = inference (app.state.model, X_test)
+    return {"Inference": f"{app.state.lb.inverse_transform(y_pred)}"}
