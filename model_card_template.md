@@ -19,19 +19,19 @@ Factors
 
 ## Training Data
 
-    Datasets: Census Dataset, containing ~32K labelled samples.
+    Datasets: Census Dataset, containing ~28K labelled samples.
     Motivation: This dataset was chosen for its diversity.
     Preprocessing: Encoder and label binarizer are trained through offline training and employed from the last one.
 
 ## Evaluation Data
  
-    Datasets: Census Dataset, containing ~32K labelled samples.
+    Datasets: Census Dataset, containing 6400 labelled samples, around 20% of the initial dataset.
     Motivation: This dataset was chosen for its diversity.
     Preprocessing: Encoder and label binarizer are trained through offline training and employed from the last one.
 
 ## Metrics
 
-    Model Performance Measures: Precision, Recall and F1 Score around data slices in slice_output.txt.
+    Model Performance Measures: Precision = 74%, Recall = 63% and F1 Score = 68%
     Decision Thresholds: The model uses a threshold of 0.5 for classifying an object into a specific category.
 
 ## Ethical Considerations

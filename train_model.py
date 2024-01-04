@@ -32,6 +32,17 @@ save_model(model, os.path.join(constants.model_folder, constants.model_file))
 save_encoders(encoder, lb, os.path.join(constants.model_folder, constants.model_encoder),
               os.path.join(constants.model_folder, constants.label_bin))
 
+# Proces the test data with the process_data function.
+X_test_all, y_test_all, _, _ = process_data (
+    test, categorical_features=constants.cat_features, label=constants.label, training=False, encoder=encoder,
+    lb=lb
+)
+
+y_pred_all = inference (model, X_test_all)
+cur_prec, cur_rec, cur_fbeta = compute_model_metrics (y_test_all, y_pred_all)
+print(f'Precision: {cur_prec}')
+print(f'Recall: {cur_rec}')
+print(f'F1: {cur_fbeta}')
 
 # Slice evaluation
 for cat_feat in constants.cat_features:
